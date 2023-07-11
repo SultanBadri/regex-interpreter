@@ -1,6 +1,8 @@
 # regex-interpreter
 This project is a Regex Interpreter and Generator web application built with Vue.js and Go, allowing users to input a regex pattern and text, display the matches found, and generate regex patterns based on the input text.
 
+![firefox_W9CbTBt7ko](https://github.com/SultanBadri/regex-interpreter/assets/46205282/6d617c51-1d70-4465-a5a6-b82888df2169)
+
 ## Getting started
 
 Clone the repository locally:
