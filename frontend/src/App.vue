@@ -1,62 +1,55 @@
-<script>
+<script setup>
+import { ref } from 'vue'
 import axios from 'axios'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
-export default {
-  data() {
-    return {
-      regexPattern: '',
-      inputText: '',
-      matches: [],
-      generatedRegexPattern: ''
-    }
-  },
+const matches = ref([])
+const inputText = ref('')
+const regexPattern = ref('')
+const generatedRegexPattern = ref('')
 
-  methods: {
-    performRegexMatching() {
-      if (this.regexPattern && this.inputText) {
-        axios
-          .post('http://localhost:8080/api/match', {
-            regexPattern: this.regexPattern,
-            inputText: this.inputText
-          })
-          .then((response) => {
-            if (response.data && response.data.matches) {
-              this.matches = response.data.matches
-            } else {
-              this.matches = []
-            }
-          })
-          .catch((error) => {
-            console.error(error)
-          })
-      } else {
-        this.matches = []
-      }
-    },
-
-    generateRegexPattern() {
-      this.generatedRegexPattern = this.escapeRegex(this.inputText)
-    },
-
-    notify() {
-      toast.success('Copied to clipboard!', {
-        autoClose: 2000
+function performRegexMatching() {
+  if (regexPattern.value && inputText.value) {
+    axios
+      .post('http://localhost:8080/api/match', {
+        regexPattern: regexPattern.value,
+        inputText: inputText.value
       })
-    },
-
-    copyToClipboard() {
-      navigator.clipboard.writeText(this.generatedRegexPattern)
-      this.notify()
-    },
-
-    escapeRegex(text) {
-      // escapes special chars to make it suitable as a regex pattern.
-      // https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
-      return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    }
+      .then((response) => {
+        if (response.data && response.data.matches) {
+          matches.value = response.data.matches
+        } else {
+          matches.value = []
+        }
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  } else {
+    matches.value = []
   }
+}
+
+function generateRegexPattern() {
+  generatedRegexPattern.value = escapeRegex(inputText.value)
+}
+
+function notify() {
+  toast.success('Copied to clipboard!', {
+    autoClose: 2000
+  })
+}
+
+function copyToClipboard() {
+  navigator.clipboard.writeText(generatedRegexPattern.value)
+  notify()
+}
+
+function escapeRegex(text) {
+  // escapes special chars to make it suitable as a regex pattern.
+  // https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 </script>
 
@@ -78,7 +71,7 @@ export default {
       <h2>Matching Results:</h2>
 
       <ul>
-        <li v-for="match in matches" :key="match">
+        <li v-for="(match, index) in matches" :key="index">
           <span class="match-summary">
             {{ match }}
           </span>
